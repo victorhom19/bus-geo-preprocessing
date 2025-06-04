@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: geo_preprocessing_module
+    build: ./
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - ${FASTAPI_PORT}:8000
+    volumes:
+      - ./app:/src/app
+    networks:
+      - net
+    command: bash -c 'alembic upgrade head && uvicorn app.main:app --host 0.0.0.0'
+    restart: always
+
+  db:
+    container_name: geo_preprocessing_db
+    image: postgres:16.3
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - .postgres:/var/lib/postgres/data
+    networks:
+      - net
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 10s
+      start_period: 30s
+      retries: 5
+    restart: always
+
+networks:
+  net:
+    driver: bridge
