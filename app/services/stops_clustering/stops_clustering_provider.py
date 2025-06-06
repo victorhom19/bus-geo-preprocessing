@@ -17,7 +17,7 @@ from config import SRC_PATH
 class StopsClusteringProvider:
     """ Класс для кластеризации остановок """
 
-    async def grid_search(self, params: StopsClusteringParams) -> List[TruncatedClusteringProfileSchema]:
+    async def grid_search(self, name: str, params: StopsClusteringParams) -> List[TruncatedClusteringProfileSchema]:
         """ Генерация предварительных профилей кластеризации на основе поиска параметров по сетке """
 
         # Загрузка исходных узлов и матрицы корреспонденций из файлов
@@ -67,7 +67,7 @@ class StopsClusteringProvider:
 
         return [
             TruncatedClusteringProfileSchema(
-                name=f'Temp Clustering Profile #{i}',
+                name=name,
                 clusters_count=result_entry[0],
                 clustering_score=result_entry[1],
                 clustering_params=result_entry[2],
@@ -98,7 +98,7 @@ class StopsClusteringProvider:
         """ Кластеризация исходных узлов """
 
         # Расчёт опорных точек на основе заданных параметров кластеризации
-        anchor_nodes, anchor_labels, orphan_nodes = cls.__find_anchor_nodes(nodes, params)
+        anchor_nodes, anchor_labels, orphan_nodes = cls.find_anchor_nodes(nodes, params)
 
         # Определение кластеров для не опорных точек
         orphan_labels = cls.fill_orphan(anchor_nodes, anchor_labels, orphan_nodes, params)

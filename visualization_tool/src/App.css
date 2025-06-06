@@ -1,0 +1,29 @@
+#root {
+  max-width: 90vw;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ContentWrapper {
+  width: 100%;
+  height: calc(90vh);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+
+}
+
+.HorizontalWrapper {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  gap: 20px;
+
+}

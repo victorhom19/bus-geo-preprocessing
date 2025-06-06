@@ -113,11 +113,16 @@ class LocalBusDataProvider:
 
         return routes_in_bbox
 
+    async def get_routes_by_ids(self, routes_ids: List[str]) -> List[RouteSchema]:
+        db_routes = await RouteDAO(self.session).get_all_by_ids(routes_ids)
+        return [self.db_route_as_schema(db_route) for db_route in db_routes]
+
     @staticmethod
     def db_stop_as_schema(db_stop: Stop) -> StopSchema:
         return StopSchema(
             id=str(db_stop.id),
             source=BusDataProvider.LOCAL,
+            external_source_id=db_stop.external_source_id,
             name=db_stop.name,
             lon=db_stop.lon,
             lat=db_stop.lat
@@ -165,7 +170,7 @@ class LocalBusDataProvider:
             elif type(node) is RouteStopPositionNode:
                 route_geometry_schemas.append(
                     RouteStopPositionSchema(
-                        type=RouteGeometryNodeType.OBSTACLE,
+                        type=RouteGeometryNodeType.STOP_POSITION,
                         lat=node.lat,
                         lon=node.lon,
                         corresponding_stop_id=str(node.corresponding_stop_id)
@@ -175,6 +180,7 @@ class LocalBusDataProvider:
         return RouteSchema(
             id=str(db_route.id),
             source=BusDataProvider.LOCAL,
+            external_source_id=db_route.external_source_id,
             name=db_route.name,
             stops=stops_schemas,
             final_stop_order=db_route.final_stop_order,

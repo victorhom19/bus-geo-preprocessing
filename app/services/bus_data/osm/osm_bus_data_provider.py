@@ -550,7 +550,7 @@ class OSMBusDataProvider:
                 traverse_to_node_id = common_node_id
 
             # Создание списков узлов сегментов
-            if way.tags.get('junction') == 'roundabout':
+            if way.tags.get('junction') in ('roundabout', 'circular'):
                 # Особой обработки требуют кольцевые дороги, так как почти всегда транспорт будет въезжать на них
                 # через общий узел, не являющийся началом этой кольцевой дороги. В таком случае может оказаться, что
                 # следующий общий узел может оказаться "позади" транспорта (учитывая что движение по кольцу может быть
@@ -629,7 +629,7 @@ class OSMBusDataProvider:
                         lat=node.lat,
                         lon=node.lon
                     ))
-                elif way.tags.get('junction') == 'roundabout' and not last_was_roundabout:
+                elif way.tags.get('junction') in ('roundabout', 'circular') and not last_was_roundabout:
                     route_nodes.append(RouteObstacleSchema(
                         type=RouteGeometryNodeType.OBSTACLE,
                         obstacle_type=RouteObstacleType.ROUNDABOUT,
@@ -646,7 +646,7 @@ class OSMBusDataProvider:
 
                 # Обновление последнего посещённого узла
                 last_node_id = node.id
-                last_was_roundabout = way.tags.get('junction') == 'roundabout'
+                last_was_roundabout = way.tags.get('junction') in ('roundabout', 'circular')
 
                 # Если была обработана последняя остановка - выход из цикла
                 # (последняя остановка может быть расположена в "середине" объекта дороги)

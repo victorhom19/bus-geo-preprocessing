@@ -44,6 +44,11 @@ async def get_bus_routes(data_request: GetBusDataRequest = Query(),
     """ Получение данных о маршрутах """
     return await Dispatcher(session).get_bus_routes(data_request.source, data_request.bbox)
 
+@bus_data_router.post('/routes_by_id')
+async def get_bus_routes_by_ids(routes_ids: List[str], session: AsyncSession = Depends(get_session)) \
+        -> List[RouteSchema]:
+    return await Dispatcher(session).get_bus_routes_by_ids(routes_ids)
+
 @bus_data_router.post('/routes')
 async def create_bus_routes(routes: List[RouteSchema],
                             session: AsyncSession = Depends(get_session)) -> List[RouteSchema]:
@@ -125,7 +130,8 @@ async def delete_clustering_data(clustering_data_id: str,
 async def generate_clustering_profiles(generate_clustering_profile_request: GenerateClusteringProfileRequest,
                                        session: AsyncSession = Depends(get_session)) -> List[TruncatedClusteringProfileSchema]:
     """ Генерация профилей кластеризации """
-    return await Dispatcher(session).generate_clustering_profile(generate_clustering_profile_request.params)
+    return await Dispatcher(session).generate_clustering_profile(generate_clustering_profile_request.name,
+                                                                 generate_clustering_profile_request.params)
 
 @stops_clustering.post('/realize')
 async def realize_clustering_profile(clustering_profile: TruncatedClusteringProfileSchema,

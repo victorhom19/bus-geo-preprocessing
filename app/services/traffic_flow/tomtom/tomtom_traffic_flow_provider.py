@@ -1,4 +1,3 @@
-import asyncio
 import json
 import multiprocessing
 import os
@@ -6,17 +5,14 @@ import time
 from typing import List, Dict
 
 from haversine import haversine, Unit
-from sqlalchemy import select, asc
+from tqdm import tqdm
 
 from app.common_types import BBox
-from app.database.daos.speed_profile_dao import SpeedProfileDAO
-from app.database.database import AsyncSessionFactory
-from app.database.models import SegmentSpeed, RouteSegment
 from app.logger import logger
 from app.schemas.enums import Weekday
 from app.schemas.route import RouteSchema
 from app.schemas.route_geometry import RouteStopPositionSchema
-from app.schemas.speed_profile_schema import SpeedProfileSchema, TruncatedSpeedProfileSchema, RouteIdToWeekday
+from app.schemas.speed_profile_schema import RouteIdToWeekday
 from app.services.traffic_flow.base_traffic_flow_provider import BaseTrafficFlowProvider, TrafficFlowSegment
 from config import SRC_PATH, app_config
 
@@ -52,9 +48,9 @@ class TomtomTrafficFlowProvider(BaseTrafficFlowProvider):
         end = time.perf_counter()
 
         log_message = "\n".join([
-            f"GP > TRAFFIC FLOW > TOMTOM | Done:",
-            f"GP > TRAFFIC FLOW > TOMTOM | * Affected routes: {len(routes)}",
-            f"GP > TRAFFIC FLOW > TOMTOM | * Processing time: {end - start:3.2f} s"
+            f"TRAFFIC FLOW > TOMTOM | Done:",
+            f"TRAFFIC FLOW > TOMTOM | * Affected routes: {len(routes)}",
+            f"TRAFFIC FLOW > TOMTOM | * Processing time: {end - start:3.2f} s"
         ])
         logger.info(log_message)
 
@@ -64,7 +60,7 @@ class TomtomTrafficFlowProvider(BaseTrafficFlowProvider):
     def routine(weekday, bbox, routes, speed_data_id):
         traffic_flow = TomtomTrafficFlowProvider.get_traffic_flow_segments(speed_data_id, weekday, bbox)
         route_id_to_weekday = {}
-        for hour in range(HOURS):
+        for hour in tqdm(range(HOURS)):
             traffic_flow_data = TomtomTrafficFlowProvider.match_routes_with_flows(routes, traffic_flow[hour])
             for route in routes:
 
@@ -79,10 +75,10 @@ class TomtomTrafficFlowProvider(BaseTrafficFlowProvider):
                     dist = haversine((node1.lat, node1.lon), (node2.lat, node2.lon),
                                      Unit.KILOMETERS)
 
-                    if speed is None:
+                    if dist == 0:
                         continue
 
-                    if speed == 0:
+                    if speed is None or speed == 0:
                         speed = 40
 
                     segment_distance += dist
@@ -112,7 +108,7 @@ class TomtomTrafficFlowProvider(BaseTrafficFlowProvider):
             json_data = json.load(file)
 
         segments = {_: [] for _ in range(HOURS)}
-        for hour in range(HOURS):
+        for hour in tqdm(range(HOURS)):
             for entry in json_data[str(hour)]:
                 segment = TrafficFlowSegment.from_json(entry)
                 p1 = segment.first_point

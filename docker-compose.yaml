@@ -7,8 +7,16 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - .env
+    environment:
+      - FASTAPI_HOST=localhost
+      - FASTAPI_PORT=8000
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=geo_preprocessing_db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=bus-geo-preprocessing-db
+      - POSTGRES_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      - PROCESS_POOL_WORKERS_NUM=8
     ports:
       - ${FASTAPI_PORT}:8000
     volumes:
@@ -21,12 +29,17 @@ services:
   db:
     container_name: geo_preprocessing_db
     image: postgres:16.3
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=geo_preprocessing_db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=bus-geo-preprocessing-db
+      - POSTGRES_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     ports:
       - ${POSTGRES_PORT}:5432
     volumes:
-      - .postgres:/var/lib/postgres/data
+      - db_volume:/var/lib/postgres/data
     networks:
       - net
     healthcheck:
@@ -36,6 +49,22 @@ services:
       start_period: 30s
       retries: 5
     restart: always
+
+  vis-tool:
+    container_name: geo-preprocessing-visualization-tool
+    build: ./visualization_tool
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    ports:
+      - 8080:8080
+    networks:
+      - net
+    depends_on:
+      - app
+    restart: always
+
+volumes:
+  db_volume:
 
 networks:
   net:

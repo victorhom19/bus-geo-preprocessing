@@ -2,8 +2,8 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from app.api.router import router
 from config import app_config
+from app.api.router import router
 
 app = FastAPI(title="Geo Preprocessing Module", version="0.1.0")
 app.include_router(router)

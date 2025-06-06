@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC_PATH = os.path.join(PROJECT_ROOT, "app")
 
+sys.path.append(PROJECT_ROOT)
 sys.path.append(SRC_PATH)
 
 class Config(BaseSettings):

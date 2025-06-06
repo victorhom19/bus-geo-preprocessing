@@ -88,6 +88,9 @@ class Dispatcher:
         else:
             raise ValueError('Non-existing bus data source!')
 
+    async def get_bus_routes_by_ids(self, routes_ids: List[str]):
+        return await LocalBusDataProvider(self.session).get_routes_by_ids(routes_ids)
+
     async def create_bus_routes(self, route_schemas: List[RouteSchema]) -> List[RouteSchema]:
         """ Создание записей об маршрутах """
         db_routes = await RouteDAO(self.session).create_all(route_schemas)
@@ -270,9 +273,9 @@ class Dispatcher:
         return ClusteringDataSchema(id=str(db_clustering_data.id), name=db_clustering_data.name)
 
     @staticmethod
-    async def generate_clustering_profile(params: StopsClusteringParams) -> List[TruncatedClusteringProfileSchema]:
+    async def generate_clustering_profile(name: str, params: StopsClusteringParams) -> List[TruncatedClusteringProfileSchema]:
         """ Генерация вариантов профиля кластеризации (поиск по сетке параметров) """
-        return await StopsClusteringProvider().grid_search(params)
+        return await StopsClusteringProvider().grid_search(name, params)
 
     async def realize_clustering_profile(self, clustering_profile: TruncatedClusteringProfileSchema)\
             -> ClusteringProfileSchema:
@@ -380,7 +383,7 @@ class Dispatcher:
 
     async def delete_clustering_profile(self, profile_id: str) -> ClusteringProfileSchema | None:
         """ Удаление профиля кластеризации """
-        db_clustering_profile = await self.get_speed_profile(profile_id)
+        db_clustering_profile = await ClusteringProfileDAO(self.session).get_by_id(profile_id)
         if db_clustering_profile is None:
             return None
         await ClusteringProfileDAO(self.session).delete_by_id(profile_id)

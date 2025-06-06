@@ -1,5 +1,7 @@
-from typing import List
+from typing import List, Sequence
+from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.daos.base_dao import BaseDAO
@@ -125,3 +127,10 @@ class RouteDAO(BaseDAO):
             _route = await self.delete_by_id(route_id)
             _routes.append(_route)
         return _routes
+
+    async def get_all_by_ids(self, routes_ids: List[str]) -> Sequence[Route]:
+        """ Получение нескольких маршрутов по списку идентификаторов """
+        routes_ids = [UUID(route_id) for route_id in routes_ids]
+        stmt = select(Route).where(Route.id.in_(routes_ids))
+        res = await self.session.execute(stmt)
+        return res.scalars().all()

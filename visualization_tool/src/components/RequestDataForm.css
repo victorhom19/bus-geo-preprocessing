@@ -1,0 +1,128 @@
+.RequestDataForm {
+    display: flex;
+    flex-direction: column;
+
+    background: rgb(107, 107, 107);
+
+    position: absolute;
+
+    margin: auto;
+
+    left: 0;
+    top: 0;
+
+    margin: 20px 0 0 20px;
+
+    min-width: 300px;
+
+    z-index: 999;
+
+    border: none;
+    border-radius: 10px;
+}
+
+.RequestDataForm > button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 180px;
+    
+    box-sizing: border-box;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+
+    font-size: 1.5vh;
+    font-weight: normal;
+}
+
+.RequestDataForm > button:hover {
+    background: #3d3d3d;
+}
+
+.RequestDataForm > button.Expanded {
+    background: #3d3d3d;
+}
+
+.RequestDataForm > button.Expanded:hover {
+    background: #242424;
+}
+
+.RequestDataForm > .Content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2vh;
+
+    box-sizing: border-box;
+    padding: 10px 20px;
+}
+
+.RequestDataForm > .Content > .Entry {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-between;
+
+    width: 100%;
+
+    gap: 1vw;
+}
+
+.RequestDataForm > .Content > .Entry > select, .RequestDataForm > .Content > .Entry > input {
+    min-width: 150px;
+    padding-left: 5px;
+}
+
+.RequestDataForm > .Content > .Entry > .Label {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.RequestDataForm > .Content > .Submit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 10px;
+
+    border-radius: 10px;
+
+    background: #3d3d3d;
+
+    border: none;
+
+    margin-top: 0.8vh;
+}
+
+.RequestDataForm > .Content > .Submit:hover {
+    background: #242424;
+}
+
+.RequestDataForm > .Content > button.Delete {
+    width: 100%;
+    height: 4vh;
+    border: none;
+    border-radius: 10px;
+    background: rgb(219, 60, 60);
+}
+
+.RequestDataForm > .Content > .Entry > button {
+    width: 100%;
+    height: 4vh;
+    border: none;
+    border-radius: 10px;
+}
+
+.RequestDataForm > .Content > .Entry > button.Back {
+    background: #3d3d3d;
+}
+
+.RequestDataForm > .Content > .Entry > button.Delete {
+    background: rgb(219, 60, 60);
+}
+
+.RequestDataForm > .Content > .Entry > button.Submit {
+    background: rgb(24, 141, 24);
+}
